@@ -4,8 +4,7 @@ path = require 'path'
 {exec, spawn} = require 'child_process'
 
 module.exports = class GitRequire
-  constructor: (@projectDir) ->
-    @config = null
+  constructor: (@projectDir, @config=null) ->
     @reposDir = null
     @repos = {}
     @repoList = []
@@ -23,6 +22,7 @@ module.exports = class GitRequire
     fn.bind(@) cb
 
   readConfig: (cb) ->
+    return cb() if @config
     file = path.join @projectDir, 'git-require.json'
     fs.readFile file, {encoding: 'utf8'}, (err, data) =>
       return cb err if err
@@ -68,7 +68,6 @@ module.exports = class GitRequire
     """, cb
 
   cloneRepo: (repo, cb) ->
-    console.log 'Cloning', repo.url, 'in', repo.dir
     run 'git', ['clone', repo.url, repo.dir], cb
 
 run = (name, args, cb) ->
